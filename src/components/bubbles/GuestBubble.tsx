@@ -8,6 +8,7 @@ type Props = {
   avatarSrc?: string
   backgroundColor?: string
   textColor?: string
+  botId?: string
 }
 
 const defaultBackgroundColor = '#3B81F6'

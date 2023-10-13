@@ -29,6 +29,7 @@ export type BotProps = {
     poweredByTextColor?: string
     badgeBackgroundColor?: string
     fontSize?: number
+    botId?: string 
 }
 
 const defaultWelcomeMessage = 'Hi there! How can I help?'
@@ -323,15 +324,19 @@ export const Bot = (props: BotProps & { class?: string }) => {
             }
         })
         return newSourceDocuments
-    }
-
+    };
+    let previousUserMessage = '';
     return (
         <>
             <div ref={botContainer} class={'relative flex w-full h-full text-base overflow-hidden bg-cover bg-center flex-col items-center chatbot-container ' + props.class}>
                 <div class="flex w-full h-full justify-center">
                     <div style={{ "padding-bottom": '100px' }} ref={chatContainer} class="overflow-y-scroll min-w-full w-full min-h-full px-3 pt-10 relative scrollable-container chatbot-chat-view scroll-smooth">
                         <For each={[...messages()]}>
-                            {(message, index) => (
+                            {(message, index) => {
+                                if (message.type === 'userMessage') { 
+                                    previousUserMessage = message.message;
+                                }
+                             return (
                                 <>
                                     {message.type === 'userMessage' && (
                                         <GuestBubble
@@ -340,6 +345,7 @@ export const Bot = (props: BotProps & { class?: string }) => {
                                             textColor={props.userMessage?.textColor}
                                             showAvatar={props.userMessage?.showAvatar}
                                             avatarSrc={props.userMessage?.avatarSrc}
+                                            botId={props.botId}
                                         />
                                     )}
                                     {message.type === 'apiMessage' && (
@@ -349,12 +355,15 @@ export const Bot = (props: BotProps & { class?: string }) => {
                                             textColor={props.botMessage?.textColor}
                                             showAvatar={props.botMessage?.showAvatar}
                                             avatarSrc={props.botMessage?.avatarSrc}
+                                            botId={props.botId}
+                                            usermessage={previousUserMessage}
                                         />
                                     )}
+
                                     {message.type === 'userMessage' && loading() && index() === messages().length - 1 && (
                                         <LoadingBubble />
                                     )}
-                                    {message.sourceDocuments && message.sourceDocuments.length &&
+                                    {message.sourceDocuments && message.sourceDocuments.length && (
                                         <div style={{ display: 'flex', "flex-direction": 'row', width: '100%' }}>
                                             <For each={[...removeDuplicateURL(message)]}>
                                                 {(src) => {
@@ -373,12 +382,14 @@ export const Bot = (props: BotProps & { class?: string }) => {
                                                                 }
                                                             }}
                                                         />
-                                                    )
+                                                    );
                                                 }}
                                             </For>
-                                        </div>}
+                                        </div>
+                                    )}
                                 </>
-                            )}
+                            );
+                            }}
                         </For>
                     </div>
                     <TextInput
