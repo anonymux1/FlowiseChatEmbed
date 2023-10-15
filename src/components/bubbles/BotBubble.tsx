@@ -5,6 +5,7 @@ import { ThumbsUpOutline } from '../icons/ThumbsupOutline'
 import { ThumbsUpFill } from '../icons/ThumbsupFill'
 import { ThumbsDownOutline } from '../icons/ThumbsDownOutline'
 import { ThumbsDownFill } from '../icons/ThumbsDownFill'
+
 type Props = {
   message: string
   showAvatar?: boolean
@@ -17,6 +18,8 @@ type Props = {
 
 const defaultBackgroundColor = '#f7f8ff'
 const defaultTextColor = '#303235'
+
+const FeedbackAPI = '';
 
 Marked.setOptions({ isNoP: true })
 
@@ -31,7 +34,34 @@ export const BotBubble = (props: Props) => {
     if (botMessageEl) {
       botMessageEl.innerHTML = Marked.parse(props.message)
     }
-  })
+  });
+  //Function to make the Feedback API call
+  const callApi = async (feedback: boolean) => {
+    try {
+      const apiData = {
+        botId: props.botId,
+        userMessage: props.usermessage,
+        message: props.message,
+        feedback: feedback ? 1 : 0,
+      };
+      const response = await fetch(FeedbackAPI, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      if (!response.ok) {
+        throw new Error('API call failed');
+      }
+
+      // Handle the API response if needed
+    } catch (error) {
+      console.error(error);
+      // Handle API call errors
+    }
+  };
 
   return (
     <div
@@ -55,6 +85,7 @@ export const BotBubble = (props: Props) => {
               setIsLiked(!isLiked());
               if (isDisliked()) setIsDisliked(false);
               // Call your API for the "👍" action here
+              callApi(true);
               // Toggle between the outline and filled thumbs-up icons
               //document.getElementById("thumbsUpButton").innerHTML = isLiked() ? <ThumbsUpFill /> : <ThumbsUpOutline />;
             }}
@@ -69,6 +100,7 @@ export const BotBubble = (props: Props) => {
               setIsDisliked(!isDisliked());
               if (isLiked()) setIsLiked(false);
               // Call your API for the "👎" action here
+              callApi(false);
               // Toggle between the outline and filled thumbs-down icons
               //const thumbsDownIcon = isLiked() ? (<ThumbsDownFill />) : (<ThumbsDownOutline />);
             }}
